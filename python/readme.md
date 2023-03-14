@@ -1,0 +1,1 @@
+`gcc -shared -fPIC -I mickey.cpp -o mickey2-0.o`

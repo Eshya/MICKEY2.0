@@ -1,31 +1,42 @@
-from ctypes import *
-libc = CDLL("./mickey2-0.so")
-import array
-import binascii
+import mickey_cpp
+import struct
+import ctypes
 
+def encrypt(key, iv, plaintext):
+    # Inisialisasi objek Mickey
+    m = mickey_cpp.Mickey(key, len(key), iv, len(iv))
+    
+    # Enkripsi plaintext
+    ciphertext = bytearray()
+    for i in range(len(plaintext)):
+        keystream = m.generateKeystreamByte()
+        ciphertext.append(keystream ^ plaintext[i])
+    
+    return bytes(ciphertext)
 
-key = array.array('B', [0x01, 0x02, 0x03, 0x04, 0x05])
-iv = array.array('B', [0x06, 0x07, 0x08, 0x09, 0x0A])
-data = array.array('B', [ord(c) for c in 'Hello World'])
+def decrypt(key, iv, ciphertext):
+    # Inisialisasi objek Mickey
+    m = mickey_cpp.Mickey(key, len(key), iv, len(iv))
+    
+    # Dekripsi ciphertext
+    plaintext = bytearray()
+    for i in range(len(ciphertext)):
+        keystream = m.generateKeystreamByte()
+        plaintext.append(keystream ^ ciphertext[i])
+    
+    return bytes(plaintext)
 
-mickey = libc.Mickey(key, len(key), iv, len(iv))
+# Contoh penggunaan
+key = (ctypes.c_uint8 * 5)(0x01, 0x02, 0x03, 0x04, 0x05)
+iv = (ctypes.c_uint8 * 5)(0x06, 0x07, 0x08, 0x09, 0x0A)
+plaintext = b'Tes enkripsi dan dekripsi menggunakan Mickey'
+# print("Plaintext:", plaintext.decode('utf-8', errors='replace'))
+print("Original:", plaintext.hex())
+# Enkripsi plaintext
+ciphertext = encrypt(key, iv, plaintext)
+print("Ciphertext:", ciphertext.hex())
 
-# Encrypt data
-encrypted_data = data.copy()
-mickey.encrypt(encrypted_data, len(encrypted_data))
-
-# Print encrypted data as hex string
-print("Encrypted data: {}".format(binascii.hexlify(encrypted_data).decode()))
-
-# Create new instance of Mickey cipher
-mickey2 = libc.Mickey(key, len(key), iv, len(iv))
-
-# Decrypt data
-decrypted_data = encrypted_data.copy()
-mickey2.decrypt(decrypted_data, len(decrypted_data))
-
-# Convert decrypted data back to string
-decrypted_data = ''.join([chr(c) for c in decrypted_data])
-
-# Print decrypted data as string
-print("Decrypted data: {}".format(binascii.hexlify(decrypted_data).decode()))
+# Dekripsi ciphertext
+plaintext_result = decrypt(key, iv, ciphertext)
+# print("Decrypt Hex:", plaintext.hex())
+print("Plaintext:", plaintext.decode('utf-8', errors='replace'))

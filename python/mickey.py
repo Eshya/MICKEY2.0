@@ -14,6 +14,8 @@ class Mickey:
             self.iv[i] = iv[i]
         self.ivIndex =  np.uint8(0)
         
+
+        
         # Initialize the last element of the IV to 0x00
         # self.iv[ivLen] = 0x00
 
@@ -31,75 +33,73 @@ class Mickey:
     def generateKeystreamByte(self):
         # Generate a keystream byte using the Mickey 2.0 algorithm
         # tmp = 0
-        # keystream = 0
-        # Step 1
         tmp =  np.uint32(0)
         keystream =  np.uint8(0)
-
-        tmp = np.uint32(self.state[0] + self.state[3])
-        self.state[0] = np.uint64(((self.state[1] ^ self.state[2]) + tmp) << 7 | ((self.state[1] ^ self.state[2]) + tmp) >> 25)
-        # print("state0: ",format(self.state[0],'X'),
-        # " tmp: ",format(tmp,'X'),
-        # " state[3]: ",format(self.state[3],'X'),
-        # " state[1]: ",format(self.state[1],'X'),
-        # "\n")
+        # Step 1
+        # np.seterr(divide='raise', invalid='raise')
+        
+        tmp = np.uint32(np.uint64(self.state[0]) + np.uint64(self.state[3]))
+        self.state[0] = np.uint32(((np.uint64(self.state[1]) ^ np.uint64(self.state[2])) + np.uint64(tmp)) << np.uint64(7) | ((np.uint64(self.state[1]) ^ np.uint64(self.state[2])) + np.uint64(tmp)) >> np.uint64(25))
+        
         
         # Step 2
-        tmp = np.uint32(self.state[1] + self.state[4])
-        self.state[1] = np.uint64(((self.state[2] ^ self.state[3]) + tmp) << 9 | ((self.state[2] ^ self.state[3]) + tmp) >> 23)
-
+        tmp = np.uint32(np.uint64(self.state[1]) + np.uint64(self.state[4]))
+        self.state[1] = np.uint32(((np.uint64(self.state[2]) ^ np.uint64(self.state[3])) + np.uint64(tmp)) << np.uint64(9) | ((np.uint64(self.state[2]) ^ np.uint64(self.state[3])) + np.uint64(tmp)) >> np.uint64(23))
         # Step 3
-        tmp = np.uint32(self.state[2] + self.state[0])
-        self.state[2] = np.uint64(((self.state[3] ^ self.state[4]) + tmp) << 13 | ((self.state[3] ^ self.state[4]) + tmp) >> 19)
+        tmp = np.uint32(np.uint64(self.state[2]) + np.uint64(self.state[0]))
+        self.state[2] = np.uint32(((np.uint64(self.state[3]) ^ np.uint64(self.state[4])) + np.uint64(tmp)) << np.uint64(13) | ((np.uint64(self.state[3]) ^ np.uint64(self.state[4])) + np.uint64(tmp)) >> np.uint64(19))
 
         # Step 4
-        tmp = np.uint32(self.state[3] + self.state[1])
-        self.state[3] = np.uint64(((self.state[4] ^ self.state[0]) + tmp) << 18 | ((self.state[4] ^ self.state[0]) + tmp) >> 14)
+        tmp = np.uint32(np.uint64(self.state[3]) + np.uint64(self.state[1]))
+        self.state[3] = np.uint32(((np.uint64(self.state[4]) ^ np.uint64(self.state[0])) + np.uint64(tmp)) << np.uint64(18) | ((np.uint64(self.state[4]) ^ np.uint64(self.state[0])) + np.uint64(tmp)) >> np.uint64(14))
 
         # Step 5
-        tmp = np.uint32(self.state[4] + self.state[2])
-        self.state[4] = np.uint64(((self.state[0] ^ self.state[1]) + tmp) << 7 | ((self.state[0] ^ self.state[1]) + tmp) >> 25)
-
+        tmp = np.uint32(np.uint64(self.state[4]) + np.uint64(self.state[2]))
+        self.state[4] = np.uint32(((np.uint64(self.state[0]) ^ np.uint64(self.state[1])) + np.uint64(tmp)) << np.uint64(7) | ((np.uint64(self.state[0]) ^ np.uint64(self.state[1])) + np.uint64(tmp)) >> np.uint64(25))
+        
         # Step 6
-        tmp = np.uint32(self.state[0] + self.state[1])
-        self.state[0] = np.uint64(((self.state[1] ^ self.state[2]) + tmp) << 9 | ((self.state[1] ^ self.state[2]) + tmp) >> 23)
+
+        tmp = np.uint32(np.uint64(self.state[0]) + np.uint64(self.state[1]))
+        self.state[0] = np.uint32(((np.uint64(self.state[1]) ^ np.uint64(self.state[2])) + np.uint64(tmp)) << np.uint64(9) | ((np.uint64(self.state[1]) ^ np.uint64(self.state[2])) + np.uint64(tmp)) >> np.uint64(23))
 
         # Step 7
-        tmp = np.uint32(self.state[1] + self.state[2])
-        self.state[1] = np.uint64(((self.state[2] ^ self.state[3]) + tmp) << 13 | ((self.state[2] ^ self.state[3]) + tmp) >> 19)
-
+        tmp = np.uint32(np.uint64(self.state[1]) + np.uint64(self.state[2]))
+        self.state[1] = np.uint32(((np.uint64(self.state[2]) ^ np.uint64(self.state[3])) + np.uint64(tmp)) << np.uint64(13) | ((np.uint64(self.state[2]) ^ np.uint64(self.state[3])) + np.uint64(tmp)) >> np.uint64(19))
+        
         # Step 8
-        tmp = np.uint32(self.state[2] + self.state[3])
-        self.state[2] = np.uint64(((self.state[3] ^ self.state[4]) + tmp) << 18 | ((self.state[3] ^ self.state[4]) + tmp) >> 14)
-
+        tmp = np.uint32(np.uint64(self.state[2]) + np.uint64(self.state[3]))
+        self.state[2] = np.uint32(((np.uint64(self.state[3]) ^ np.uint64(self.state[4])) + np.uint64(tmp)) << np.uint64(18) | ((np.uint64(self.state[3]) ^ np.uint64(self.state[4])) + np.uint64(tmp)) >> np.uint64(14))
+        
         # Step 9
-        tmp = np.uint32(self.state[3] + self.state[4])
-        self.state[3] = np.uint64(((self.state[4] ^ self.state[0]) + tmp) << 7 | ((self.state[4] ^ self.state[0]) + tmp) >> 25)
-
+        tmp = np.uint32(np.uint64(self.state[3]) + np.uint64(self.state[4]))
+        self.state[3] = np.uint32(((np.uint64(self.state[4]) ^ np.uint64(self.state[0])) + np.uint64(tmp)) << np.uint64(7) | ((np.uint64(self.state[4]) ^ np.uint64(self.state[0])) + np.uint64(tmp)) >> np.uint64(25))
+        
         # Step 10
-        tmp = np.uint32(self.state[4] + self.state[0])
-        self.state[4] = np.uint64(((self.state[0] ^ self.state[1]) + tmp) << 9 | ((self.state[0] ^ self.state[1]) + tmp) >> 23)
-
+        tmp = np.uint32(np.uint64(self.state[4]) + np.uint64(self.state[0]))
+        self.state[4] = np.uint32(((np.uint64(self.state[0]) ^ np.uint64(self.state[1])) + np.uint64(tmp)) << np.uint64(9) | ((np.uint64(self.state[0]) ^ np.uint64(self.state[1])) + np.uint64(tmp)) >> np.uint64(23))
+        
         # Step 11
-        tmp = np.uint32(self.state[0] + self.state[1])
-        self.state[0] = np.uint64(((self.state[1] ^ self.state[2]) + tmp) << 13 | ((self.state[1] ^ self.state[2]) + tmp) >> 19)
-
+        tmp = np.uint32(np.uint64(self.state[0]) + np.uint64(self.state[1]))
+        self.state[0] = np.uint32(((np.uint64(self.state[1]) ^ np.uint64(self.state[2])) + np.uint64(tmp)) << np.uint64(13) | ((np.uint64(self.state[1]) ^ np.uint64(self.state[2])) + np.uint64(tmp)) >> np.uint64(19))
+        
         # Step 12
-        tmp = np.uint32(self.state[1] + self.state[2])
-        self.state[1] = np.uint64(((self.state[2] ^ self.state[3]) + tmp) << 18 | ((self.state[2] ^ self.state[3]) + tmp) >> 14)
-
+        tmp = np.uint32(np.uint64(self.state[1]) + np.uint64(self.state[2]))
+        self.state[1] = np.uint32(((np.uint64(self.state[2]) ^ np.uint64(self.state[3])) + np.uint64(tmp)) << np.uint64(18) | ((np.uint64(self.state[2]) ^ np.uint64(self.state[3])) + np.uint64(tmp)) >> np.uint64(14))
+        
         # Step 13
-        keystream = np.uint8((self.state[0] >> 24) & 0xFF)
+       
+        keystream = np.uint8((np.uint64(self.state[0]) >> np.uint64(24)) & np.uint64(255))
         # print("state0: ",format(self.state[0],'02X')," keystream: ",format(keystream,'02X'),"\n")
         
-        # Step 14
-        self.state[0] = np.uint64((self.state[0] << 8) | ((self.state[1] >> 24) & 0xFF))
-        self.state[1] = np.uint64((self.state[1] << 8) | ((self.state[2] >> 24) & 0xFF))
-        self.state[2] = np.uint64((self.state[2] << 8) | ((self.state[3] >> 24) & 0xFF))
-        self.state[3] = np.uint64((self.state[3] << 8) | ((self.state[4] >> 24) & 0xFF))
-        self.state[4] = np.uint64((self.state[4] << 8) | (keystream ^ self.iv[self.ivIndex]))
-        # self.state[4] = (self.state[4] << 8) | (keystream & 255)
 
+        # Step 14
+        self.state[0] = np.uint32((np.uint64(self.state[0]) << np.uint64(8)) | ((np.uint64(self.state[1]) >> np.uint64(24)) & np.uint64(0xFF)))
+        self.state[1] = np.uint32((np.uint64(self.state[1]) << np.uint64(8)) | ((np.uint64(self.state[2]) >> np.uint64(24)) & np.uint64(0xFF)))
+        self.state[2] = np.uint32((np.uint64(self.state[2]) << np.uint64(8)) | ((np.uint64(self.state[3]) >> np.uint64(24)) & np.uint64(0xFF)))
+        self.state[3] = np.uint32((np.uint64(self.state[3]) << np.uint64(8)) | ((np.uint64(self.state[4]) >> np.uint64(24)) & np.uint64(0xFF)))
+        self.state[4] = np.uint32((np.uint64(self.state[4]) << np.uint64(8)) | (np.uint64(keystream) ^ np.uint64(self.iv[self.ivIndex])))
+        # self.state[4] = (self.state[4] << 8) | (keystream & 255)
+       
         self.ivIndex += 1
         # print(self.ivIndex)
         if self.ivIndex >= MICKEY_IV_SIZE:
@@ -113,7 +113,7 @@ class Mickey:
         encrypted_data = bytearray(dataLen)
         for i in range(dataLen):
             # Generate a keystream byte
-            keystream =  self.generateKeystreamByte()
+            keystream = self.generateKeystreamByte()
             # XOR the plaintext byte with the keystream byte to produce the ciphertext byte
             encrypted_data[i] = np.uint8(data[i]) ^ keystream
         return bytes(encrypted_data)
